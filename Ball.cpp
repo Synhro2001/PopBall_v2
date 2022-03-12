@@ -56,7 +56,6 @@ void Ball::setSpeed(float dX, float dY) {
     if (dY < -10) dY = -10;
 
     dX_ = dX;
-    dY_ = dY;
 
 
 }
