@@ -140,13 +140,36 @@ namespace PopBallKrasovskis {
 	}
 
 	private: void Form_MouseWheel(Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-		
 
+		float dx = ball->getdX();
+		float dy = ball->getdY();
+		
+		if (e->Delta > 0) {
+			if (dx < 15) {
+				dx = dx * 2; // умножаем на коэфицент > 1
+			}
+			if (dy < 15) {
+				dy = dy * 2;
+			}
+			ball->setSpeed(dx, dy);
+		}
+		else  {
+			if (abs(dx) > 1) { // берем число в модуль чтобы при изменение скорости шарика его анимация не меняля направление !!!
+				dx = dx * 0.5; // умножаем на коэфицент < 1
+			}
+			if (abs(dy) > 1) {
+				dy = dy * 0.5;
+			}
+
+			ball->setSpeed(dx, dy);
+		}
+
+		
 
 		if (ModifierKeys == Keys::Control) {
 
 
-			if (e->Delta < 0) {
+ 			if (e->Delta < 0) {
 				ball->setSize(ball->getSize() - 5);
 			}
 			else {
