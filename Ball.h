@@ -24,6 +24,7 @@ public:
 	float getdY();
 	void setSpeed(float dX, float dY);
 	void move();
+	void followTo(int x, int y);
 };
 
 extern Ball* ball;
