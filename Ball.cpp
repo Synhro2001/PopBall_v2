@@ -1,5 +1,6 @@
 #include "Ball.h"
 #include <iostream>;
+#include <math.h>;
 
 Ball* ball;
 
@@ -11,8 +12,8 @@ Ball::Ball(int frameWidth, int frameHeight) {
     size_ = 30;
     color_ = 0x78FF0000; //   Transparent red color.
 
-    dX_ = 1;
-    dY_ = 1;
+    dX_ = (rand() % 10) - 10;
+    dY_ = (rand() % 10) - 10;
 
 }
 
@@ -62,7 +63,7 @@ void Ball::setSpeed(float dX, float dY) {
 }
 
 void Ball::move() {
-
+    
     if ((x_ <= size_) || (x_ > frameWidth_ - size_))
     {
         dX_ = -dX_;
@@ -102,5 +103,36 @@ void Ball::setSize(int size) {
 
 
 }
+
+void Ball::followTo(int x, int y) {
+
+    // дл€ начало узнаЄм проекцию  скорости дл€ x , y 
+    //ѕри большой скорости шарик при нажатие правой мыши вылетает за пол€ 
+
+    float hor_speed = x - x_; // horizontal spped
+    float ver_speed = y - y_; // vertical speed
+
+    float speed = sqrt((dX_*dX_) + (dY_ * dY_));
+    float angle = atan2(abs(ver_speed), abs(hor_speed)); // берем значение чисел в модуль и считаем угол
+   
+    float dx ,dy;
+    dx = speed * cos(angle);
+    dy = speed * sin(angle);
+
+    if (x < x_) {
+        dX_ = -dx;
+    }
+    else {
+        dX_ = dx;
+    }
+    if (y < y_) {
+        dY_ = -dy;
+    } 
+    else {
+        dY_ = dy;
+    }
+   
+}
+
 
 
