@@ -78,6 +78,7 @@ namespace PopBallKrasovskis {
 			this->frame->MouseDoubleClick += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::frame_MouseDoubleClick);
 			this->frame->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::MainForm_MouseDown);
 			this->frame->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::frame_MouseMove);
+			this->frame->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &MainForm::frame_MouseUp);
 			// 
 			// drawTimer
 			// 
@@ -108,6 +109,12 @@ namespace PopBallKrasovskis {
 		}
 #pragma endregion
 
+	private: 
+		int x1, y1, x2, y2, nt;
+		bool timer_counter;
+		float dx, dy;
+
+
 
 	private: System::Void frame_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 		Graphics^ grp = e->Graphics;
@@ -119,8 +126,20 @@ namespace PopBallKrasovskis {
 	}
 
 	private: System::Void MainForm_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		
+		if (e->Button == System::Windows::Forms::MouseButtons::Left) { // момент нажатие левой клавиши мыши
+			ball->setPos(e->X, e->Y);
+			 ball->setSpeed(0, 0); // останавливаем шарик в момент нажатие мышки
+			 x1 = e->X; // передаем координаты 
+			 y1 = e->Y;
+			 nt = 0;
+			 timer_counter = true;
 
-		ball->setPos(e->X, e->Y);
+		}
+		
+		else if (e->Button == System::Windows::Forms::MouseButtons::Right) {
+			ball->followTo(e->X, e->Y);
+		}
 
 	}
 
@@ -128,6 +147,9 @@ namespace PopBallKrasovskis {
 
 		if (e->Button == System::Windows::Forms::MouseButtons::Left) {
 			ball->setPos(e->X, e->Y);
+		}
+		else if (e->Button == System::Windows::Forms::MouseButtons::Right) {
+			ball->followTo(e->X, e->Y);
 		}
 	}
 
@@ -141,8 +163,24 @@ namespace PopBallKrasovskis {
 
 	private: void Form_MouseWheel(Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
 
-		float dx = ball->getdX();
-		float dy = ball->getdY();
+
+		if (ModifierKeys == Keys::Control) {
+
+
+			if (e->Delta < 0) {
+				ball->setSize(ball->getSize() - 5);
+			}
+			else {
+				ball->setSize(ball->getSize() + 5);
+			}
+
+		}
+
+
+
+		// Есть ошибка если резко менять скорость программа зависает ( она багуется в одной координате )
+		dx = ball->getdX();
+		dy = ball->getdY();
 		
 		if (e->Delta > 0) {
 			if (dx < 15) {
@@ -164,30 +202,35 @@ namespace PopBallKrasovskis {
 			ball->setSpeed(dx, dy);
 		}
 
-		
-
-		if (ModifierKeys == Keys::Control) {
-
-
- 			if (e->Delta < 0) {
-				ball->setSize(ball->getSize() - 5);
-			}
-			else {
-				ball->setSize(ball->getSize() + 5);
-			}
-
-		}
 	}
 
 	private: System::Void moveTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
 		ball->move();
-	}
+		if (timer_counter == true) {
+			
+			nt++;
+		}
 	
+	}
 
 	private: System::Void drawTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
 		frame->Invalidate();
 	}
 
 
-	};
+	private: System::Void frame_MouseUp(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+
+		if (e->Button == System::Windows::Forms::MouseButtons::Left) {
+			timer_counter = false;
+			x2 = e->X; // передаем координаты после того как мы отпустили левый шелчек
+			y2 = e->Y;
+			
+			dx = (x2 - x1) / nt;
+			dy = (y2 - y1) / nt;
+			ball->setSpeed(dx, dy);
+			
+		}
+
+	}
+};
 }
